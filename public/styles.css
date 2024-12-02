@@ -1,0 +1,326 @@
+@font-face {
+  font-family: "Raleway-Variable";
+  src: url("fonts/Raleway-VariableFont_wght.ttf") format("truetype");
+  /* O caminho '../fonts/SuaFonte.ttf' referencia a pasta 'fonts' */
+  /* Adicione outros formatos de fonte e configurações conforme necessário */
+}
+
+body {
+  font-family: "Raleway-Variable", sans-serif;
+  /* Usando a fonte recém-definida */
+  text-align: center;
+  overflow: hidden;
+  background-color: rgb(29, 29, 29);
+  user-select: none;
+  margin: 0;
+  width: 100vw;
+  height: 100vh;
+  border: none;
+}
+
+h1 {
+  text-align: center;
+}
+
+#iptvPlayer {
+  width: 100vw;
+  height: 100vh;
+}
+
+.group {
+  margin-bottom: 20px;
+  border-radius: 10px;
+}
+
+.group-title {
+  cursor: pointer;
+  color: white;
+  padding: 10px;
+  border-radius: 5px;
+  text-align: left;
+  font-size: 18px;
+}
+
+/* Estilo para quando houver hover no canal */
+.group:hover {
+  background-color: #ffffff;
+  color: black;
+}
+
+/* Altera a cor do nome quando o canal for hovered */
+.group:hover .group-title {
+  color: black; /* Muda o texto para preto */
+}
+
+#dash-control {
+  position: fixed;
+  bottom: -100%; /* Inicia fora da tela */
+  left: 0;
+  width: 100vw;
+  height: 60vh;
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 1),
+    rgba(0, 0, 0, 0.9),
+    rgba(0, 0, 0, 0.8),
+    rgba(0, 0, 0, 0.7),
+    rgba(0, 0, 0, 0.5)
+  );
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: bottom 0.5s ease-in-out; /* Transição suave */
+  z-index: 1000;
+}
+
+#dash-control.active {
+  bottom: 0; /* Move para dentro da tela */
+}
+
+
+#channelsContainer {
+  width: 15%; /* Define uma largura fixa para a primeira div */
+  height: 100%; /* Preenche a altura disponível */
+  overflow-y: auto; /* Rolagem vertical */
+  padding: 10px;
+}
+
+#programacao {
+  flex: 0.5; /* Faz a segunda div ocupar o restante do espaço */
+  height: 100%; /* Preenche a altura disponível */
+  overflow-y: auto; /* Rolagem vertical */
+  padding: 10px;
+}
+
+/* Customização da barra de rolagem */
+#programacao::-webkit-scrollbar {
+  width: 8px; /* Largura da barra de rolagem */
+}
+
+#programacao::-webkit-scrollbar-thumb {
+  background-color: #888; /* Cor do polegar da barra de rolagem */
+  border-radius: 10px; /* Bordas arredondadas no polegar */
+}
+
+#programacao::-webkit-scrollbar-thumb:hover {
+  background-color: #555; /* Cor do polegar quando o mouse passa por cima */
+}
+
+#programacao::-webkit-scrollbar-track {
+  background: #f1f1f100; /* Cor do fundo da barra de rolagem */
+  border-radius: 10px; /* Bordas arredondadas no trilho */
+}
+
+/* Customização da barra de rolagem */
+#channelsContainer::-webkit-scrollbar {
+  width: 8px; /* Largura da barra de rolagem */
+}
+
+#channelsContainer::-webkit-scrollbar-thumb {
+  background-color: #888; /* Cor do polegar da barra de rolagem */
+  border-radius: 10px; /* Bordas arredondadas no polegar */
+}
+
+#channelsContainer::-webkit-scrollbar-thumb:hover {
+  background-color: #555; /* Cor do polegar quando o mouse passa por cima */
+}
+
+#channelsContainer::-webkit-scrollbar-track {
+  background: #f1f1f100; /* Cor do fundo da barra de rolagem */
+  border-radius: 10px; /* Bordas arredondadas no trilho */
+}
+
+#channel-list {
+  flex: 1; /* Faz a segunda div ocupar o restante do espaço */
+  height: 100%; /* Preenche a altura disponível */
+  overflow-y: auto; /* Rolagem vertical */
+  padding: 10px;
+}
+
+/* Customização da barra de rolagem */
+#channel-list::-webkit-scrollbar {
+  width: 8px; /* Largura da barra de rolagem */
+}
+
+#channel-list::-webkit-scrollbar-thumb {
+  background-color: #888; /* Cor do polegar da barra de rolagem */
+  border-radius: 10px; /* Bordas arredondadas no polegar */
+}
+
+#channel-list::-webkit-scrollbar-thumb:hover {
+  background-color: #555; /* Cor do polegar quando o mouse passa por cima */
+}
+
+#channel-list::-webkit-scrollbar-track {
+  background: #f1f1f100; /* Cor do fundo da barra de rolagem */
+  border-radius: 10px; /* Bordas arredondadas no trilho */
+}
+
+.channel {
+  height: 100px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 15px;
+  background-color: #3b3b3b29;
+  margin: 10px;
+}
+
+.channel-logo {
+  width: 70px;
+  height: auto;
+  margin-left: 25px;
+}
+
+.channel-name {
+  flex-grow: 0.1; /* Faz o nome ocupar o espaço restante */
+  margin: 0;
+  color: aliceblue; /* Cor inicial do texto */
+}
+
+/* Estilo para quando houver hover no canal */
+.channel:hover {
+  background-color: #ffffff;
+  color: black;
+}
+
+/* Altera a cor do nome quando o canal for hovered */
+.channel:hover .channel-name {
+  color: black; /* Muda o texto para preto */
+}
+
+.vivo {
+  background-color: red;
+  border-radius: 5px;
+  width: 70px;
+  color: aliceblue;
+  display: grid;
+  place-items: center; /* Centraliza horizontal e verticalmente */
+}
+
+.programa {
+  color: #000000;
+  text-align: left;
+}
+
+/* Estilos para destacar a programação */
+.programa {
+  padding: 20px;
+  border-radius: 15px;
+  margin: 10px 0;
+  background-color: #000000;
+}
+.programa-atual {
+  background-color: white;
+  color: black;
+}
+.programa-proximo {
+  background-color: rgba(0, 0, 0, 0.432);
+  color: white;
+}
+
+.selected {
+  background-color: #ffffff;
+}
+
+.group.selected h2 {
+  color: black;
+}
+
+.channel.selected h3 {
+  color: black;
+}
+
+.progress-bar {
+  height: 5px;
+  border-radius: 5px;
+  background-color: red;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  color: white;
+  position: fixed;
+  top: -100px;
+  left: 0;
+  width: 100%;
+  z-index: 1000; /* Garante que fique sobre outros conteúdos */
+  gap: 10px;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.5),
+    rgba(0, 0, 0, 0.4),
+    rgba(0, 0, 0, 0.3),
+    rgba(0, 0, 0, 0.2),
+    rgba(0, 0, 0, 0.1)
+  );
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: top 0.5s ease-in-out; /* Transição suave */
+  z-index: 1000;
+}
+
+#topbar.active {
+  top: 0; /* Move para dentro da tela */
+}
+
+.topbar .left, .topbar .center, .topbar .right {
+  display: flex;
+  align-items: center;
+}
+
+.topbar .left a, .topbar .right a {
+  margin: 15px 15px;
+  color: white;
+  text-decoration: none;
+  font-size: xx-large;
+  font-weight: normal;
+  font-size: 25px;
+}
+
+.topbar .left a:hover, .topbar .right a:hover {
+  text-decoration: underline;
+}
+
+.center {
+  flex-grow: 1;
+  justify-content: center;
+  text-align: center;
+}
+
+.time {
+  font-size: xx-large;
+  font-weight: bold;
+  font-size: 25px;
+  margin-left: 25px;
+}
+
+.weather {
+  font-size: xx-large;
+  font-weight: bold;
+  font-size: 25px;
+  margin-left: 25px;
+}
+
+.right .icons {
+  display: flex;
+  align-items: center;
+}
+
+.right .icon {
+  margin-left: 20px;
+  cursor: pointer;
+}
+
+.right .icon img {
+  width: 20px;
+  height: 20px;
+}
+
