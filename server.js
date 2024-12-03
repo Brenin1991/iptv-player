@@ -50,12 +50,23 @@ function lerListaM3U(caminhoArquivo) {
 
       playlist.segments.forEach((segment) => {
         const title = segment.title || ""; // Verificação de título
-        const name = title.match(/tvg-id="([^"]+)"/)?.[1] || "Desconhecido";
-        const group = title.match(/group-title="([^"]+)"/)?.[1] || "Sem grupo";
+
+        // Extraindo o nome do canal, que deve estar após a vírgula e antes do link
+        const nameMatch = title.match(/,([^,]+)(?=\s*$)/);
+        
+        // Se encontrado, extrai o nome, caso contrário usa "Desconhecido"
+        const name = nameMatch ? nameMatch[1].trim() : "Desconhecido";
+        const id = title.match(/tvg-id="([^"]+)"/)?.[1] || "Desconhecido";
+
+        // Extrair o logo, caso exista
         const logo = title.match(/tvg-logo="([^"]+)"/)?.[1] || "";
 
+        // Extrair o grupo, caso exista
+        const group = title.match(/group-title="([^"]+)"/)?.[1] || "Sem grupo";
+
         streams.push({
-          name: name || "Desconhecido",
+          id: id,
+          name: name,
           url: segment.uri,
           group: group,
           logo: logo,

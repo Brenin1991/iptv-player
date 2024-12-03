@@ -38,9 +38,7 @@
           <a href="#" class="icon"
             ><img src="setting.png" alt="Configurações"
           /></a>
-          <a href="#" class="icon"
-            ><img src="user.png" alt="Perfil"
-          /></a>
+          <a href="#" class="icon"><img src="user.png" alt="Perfil" /></a>
         </div>
       </div>
     </div>
@@ -118,6 +116,8 @@
               groupDiv.appendChild(groupHeader);
               channelsDiv.appendChild(groupDiv);
             });
+
+            loadProgramacao();
           })
           .catch((error) => {
             console.error("Erro ao carregar os canais:", error);
@@ -155,7 +155,7 @@
             // Adiciona a classe 'selected' ao elemento clicado, se ainda não estiver
             if (!channelDiv.classList.contains("selected")) {
               loadStream(stream.url);
-              loadProgramacao(stream.name); // Carregar a programação do canal
+              setUpProgramacao(stream.id); // Carregar a programação do canal
               channelDiv.classList.add("selected");
             }
           };
@@ -172,115 +172,122 @@
 
       // Função para carregar a programação de um canal
       // Função para carregar a programação de um canal
-      function loadProgramacao(canal) {
-        console.log(canal);
+      function loadProgramacao() {
         fetch("/programacao")
           .then((response) => response.json())
           .then((data) => {
             programacaoData = data;
-            const programacaoDiv = document.getElementById("programacao");
-
-            // Filtrar a programação para o canal selecionado
-            const canalProgramacao = programacaoData.filter(
-              (prog) => prog.canal === canal
-            );
-
-            // Obter a data e hora atual
-            const now = moment(); // Usando moment.js para lidar com a data atual
-
-            // Ordenar a programação (opcional, se quiser manter a ordem cronológica)
-            canalProgramacao.sort((a, b) =>
-              moment(a.inicio, "DD/MM/YYYY HH:mm:ss").isBefore(
-                moment(b.inicio, "DD/MM/YYYY HH:mm:ss")
-              )
-                ? -1
-                : 1
-            );
-
-            programacaoDiv.innerHTML = ""; // Limpar conteúdo anterior
-
-            // Iterar sobre a programação e exibir a partir do programa atual
-            canalProgramacao.forEach((prog) => {
-              const start = moment(prog.inicio, "DD/MM/YYYY HH:mm:ss"); // Horário de início
-              const end = moment(prog.fim, "DD/MM/YYYY HH:mm:ss"); // Horário de fim
-
-              // Verificar se o programa é atual ou futuro
-              if (start.isBefore(now) && end.isAfter(now)) {
-                // Programa atual
-                createProgramDiv(prog, true, now, start, end);
-              } else if (start.isAfter(now)) {
-                // Programa futuro
-                createProgramDiv(prog, false);
-              }
-            });
-
-            // Função para criar as divs dos programas
-            function createProgramDiv(prog, isCurrent, now, start, end) {
-              const progDiv = document.createElement("div");
-              progDiv.classList.add("programa");
-
-              if (isCurrent) {
-                progDiv.classList.add("programa-atual"); // Classe CSS para o programa atual
-              } else {
-                progDiv.classList.add("programa-proximo"); // Classe CSS para o programa futuro
-              }
-
-              const titulo = document.createElement("h4");
-              titulo.textContent = prog.programa;
-              progDiv.appendChild(titulo);
-
-              const descricao = document.createElement("p");
-              descricao.textContent = prog.descricao;
-              progDiv.appendChild(descricao);
-
-              const horario = document.createElement("p");
-              horario.textContent = `Início: ${prog.inicio} | Fim: ${prog.fim}`;
-              progDiv.appendChild(horario);
-
-              const rating = document.createElement("p");
-              progDiv.appendChild(rating);
-              setRating(prog, rating);
-
-              // Barra de progresso
-              if (isCurrent) {
-                const progressBarContainer = document.createElement("div");
-                progressBarContainer.classList.add("progress-bar-container");
-
-                const progressBar = document.createElement("div");
-                progressBar.classList.add("progress-bar");
-
-                const duration = end.diff(start); // Duração do programa em milissegundos
-                const elapsed = now.diff(start); // Tempo decorrido desde o início do programa
-
-                // Calcular o progresso (porcentagem)
-                const progress = Math.min((elapsed / duration) * 100, 100);
-                progressBar.style.width = `${progress}%`; // Atualizar a largura da barra
-
-                progressBarContainer.appendChild(progressBar);
-                progDiv.appendChild(progressBarContainer);
-
-                // Atualizar a barra de progresso a cada segundo
-                const interval = setInterval(() => {
-                  const newElapsed = moment().diff(start);
-                  const newProgress = Math.min(
-                    (newElapsed / duration) * 100,
-                    100
-                  );
-                  progressBar.style.width = `${newProgress}%`;
-
-                  if (newProgress >= 100) {
-                    clearInterval(interval); // Parar a atualização quando a barra atingir 100%
-                    loadProgramacao(canal);
-                  }
-                }, 1000); // Atualizar a cada segundo
-              }
-
-              programacaoDiv.appendChild(progDiv);
-            }
           })
           .catch((error) => {
             console.error("Erro ao carregar a programação:", error);
           });
+      }
+
+      function normalizeName(name) {
+        // Remover espaços extras, caracteres especiais e converter para minúsculas
+        return name.replace(/\s+/g, '').replace(/[^\w\s]/g, '').toLowerCase();
+      }
+
+
+      function setUpProgramacao(canal) {
+        console.log(canal);
+
+        const programacaoDiv = document.getElementById("programacao");
+
+        // Filtrar a programação para o canal selecionado, normalizando os nomes
+        const canalProgramacao = programacaoData.filter(
+          (prog) => normalizeName(prog.canal) === normalizeName(canal)
+        );
+
+        // Obter a data e hora atual
+        const now = moment(); // Usando moment.js para lidar com a data atual
+
+        // Ordenar a programação (opcional, se quiser manter a ordem cronológica)
+        canalProgramacao.sort((a, b) =>
+          moment(a.inicio, "DD/MM/YYYY HH:mm:ss").isBefore(
+            moment(b.inicio, "DD/MM/YYYY HH:mm:ss")
+          )
+            ? -1
+            : 1
+        );
+
+        programacaoDiv.innerHTML = ""; // Limpar conteúdo anterior
+
+        // Iterar sobre a programação e exibir a partir do programa atual
+        canalProgramacao.forEach((prog) => {
+          const start = moment(prog.inicio, "DD/MM/YYYY HH:mm:ss"); // Horário de início
+          const end = moment(prog.fim, "DD/MM/YYYY HH:mm:ss"); // Horário de fim
+
+          // Verificar se o programa é atual ou futuro
+          if (start.isBefore(now) && end.isAfter(now)) {
+            // Programa atual
+            createProgramDiv(prog, true, now, start, end);
+          } else if (start.isAfter(now)) {
+            // Programa futuro
+            createProgramDiv(prog, false);
+          }
+        });
+
+        // Função para criar as divs dos programas
+        function createProgramDiv(prog, isCurrent, now, start, end) {
+          const progDiv = document.createElement("div");
+          progDiv.classList.add("programa");
+
+          if (isCurrent) {
+            progDiv.classList.add("programa-atual"); // Classe CSS para o programa atual
+          } else {
+            progDiv.classList.add("programa-proximo"); // Classe CSS para o programa futuro
+          }
+
+          const titulo = document.createElement("h4");
+          titulo.textContent = prog.programa;
+          progDiv.appendChild(titulo);
+
+          const descricao = document.createElement("p");
+          descricao.textContent = prog.descricao;
+          progDiv.appendChild(descricao);
+
+          const horario = document.createElement("p");
+          horario.textContent = `Início: ${prog.inicio} | Fim: ${prog.fim}`;
+          progDiv.appendChild(horario);
+
+          const rating = document.createElement("p");
+          progDiv.appendChild(rating);
+          setRating(prog, rating);
+
+          // Barra de progresso
+          if (isCurrent) {
+            const progressBarContainer = document.createElement("div");
+            progressBarContainer.classList.add("progress-bar-container");
+
+            const progressBar = document.createElement("div");
+            progressBar.classList.add("progress-bar");
+
+            const duration = end.diff(start); // Duração do programa em milissegundos
+            const elapsed = now.diff(start); // Tempo decorrido desde o início do programa
+
+            // Calcular o progresso (porcentagem)
+            const progress = Math.min((elapsed / duration) * 100, 100);
+            progressBar.style.width = `${progress}%`; // Atualizar a largura da barra
+
+            progressBarContainer.appendChild(progressBar);
+            progDiv.appendChild(progressBarContainer);
+
+            // Atualizar a barra de progresso a cada segundo
+            const interval = setInterval(() => {
+              const newElapsed = moment().diff(start);
+              const newProgress = Math.min((newElapsed / duration) * 100, 100);
+              progressBar.style.width = `${newProgress}%`;
+
+              if (newProgress >= 100) {
+                clearInterval(interval); // Parar a atualização quando a barra atingir 100%
+                setUpProgramacao(canal);
+              }
+            }, 1000); // Atualizar a cada segundo
+          }
+
+          programacaoDiv.appendChild(progDiv);
+        }
       }
 
       function setRating(programacao, rating) {
@@ -370,7 +377,8 @@
         const timeString = date.toLocaleTimeString();
         const dateString = date.toLocaleDateString("pt-BR", options);
 
-        document.getElementById("time").innerText = timeString + " " + dateString;;
+        document.getElementById("time").innerText =
+          timeString + " " + dateString;
       }
 
       // Função para obter a previsão do tempo
@@ -382,9 +390,7 @@
           const response = await fetch(apiUrl);
           const data = await response.json();
           const temp = data.main.temp;
-          document.getElementById(
-            "weather"
-          ).innerText = `${temp}°C`;
+          document.getElementById("weather").innerText = `${temp}°C`;
         } catch (error) {
           document.getElementById("weather").innerText =
             "Erro ao obter a previsão do tempo";
