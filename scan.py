@@ -20,7 +20,7 @@ def capture_traffic():
 
     print(f"Capturando tráfego... Seu IP local é {local_ip}")
     
-    capture = pyshark.LiveCapture(interface='Ethernet', display_filter='ip')
+    capture = pyshark.LiveCapture(interface='Wifi', display_filter='ip')
 
     # Captura pacotes de forma contínua
     for packet in capture.sniff_continuously():
