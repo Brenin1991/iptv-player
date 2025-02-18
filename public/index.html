@@ -1,407 +1,47 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-  <head>
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
-    />
-    <title>Player IPTV</title>
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <video id="iptvPlayer" width="100%" controls>
-      Seu navegador não suporta o elemento de vídeo.
-    </video>
 
-    <!-- Topbar -->
-    <div id="topbar" class="topbar active">
-      <!-- Left Section -->
-      <div class="left">
-        <a href="#">TV Ao Vivo</a>
-        <a href="#">Séries</a>
-        <a href="#">Filmes</a>
-        <a href="#">Novelas</a>
-        <a href="#">Infantil</a>
-        <a href="#">Música</a>
-      </div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>Player IPTV</title>
+  <link rel="stylesheet" href="styles/styles.css" />
+</head>
 
-      <!-- Center Section -->
-      <div class="center">
-        <div class="time" id="time"></div>
-        <div class="weather" id="weather"></div>
-      </div>
-
-      <!-- Right Section -->
-      <div class="right">
-        <div class="icons">
-          <a href="#" class="icon"
-            ><img src="setting.png" alt="Configurações"
-          /></a>
-          <a href="#" class="icon"><img src="user.png" alt="Perfil" /></a>
-        </div>
-      </div>
+<body>
+  <video id="iptvPlayer" width="100%" controls>
+    Seu navegador não suporta o elemento de vídeo.
+  </video>
+  <div id="topbar" class="topbar active">
+    <div class="left">
     </div>
 
-    <div id="dash-control" class="active">
-      <div id="channelsContainer">
-        <!-- Canais serão carregados aqui -->
-      </div>
-
-      <div id="channel-list">
-        <!-- Canais serão carregados aqui -->
-      </div>
-      <div id="programacao">
-        <!-- Programação do canal será carregada aqui -->
-      </div>
+    <div class="center">
+      <div class="time" id="time"></div>
+      <div class="date" id="date"></div>
+      <div class="weather" id="weather"></div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
+    <div class="right">
+      <div class="icons">
+        <a href="#" class="icon"><img src="setting.png" alt="Configurações" /></a>
+        <a href="#" class="icon"><img src="user.png" alt="Perfil" /></a>
+      </div>
+    </div>
+  </div>
+  <div id="dash-control" class="active">
+    <div id="channelsContainer">
+    </div>
 
-    <script>
-      var video = document.getElementById("iptvPlayer");
+    <div id="channel-list">
+    </div>
+    <div id="programacao">
+    </div>
+  </div>
 
-      let groups = {};
-      let loadData;
-      let programacaoData = [];
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
+  <script src="script.js"></script>
+</body>
 
-      // Função para carregar o stream
-      function loadStream(url) {
-        if (Hls.isSupported()) {
-          var hls = new Hls();
-          hls.loadSource(url);
-          hls.attachMedia(video);
-        } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
-          video.src = url;
-        }
-      }
-
-      // Função para carregar os canais e organizar por grupo
-      function loadChannels() {
-        fetch("/streams")
-          .then((response) => response.json())
-          .then((data) => {
-            loadData = data;
-            const channelsDiv = document.getElementById("channelsContainer");
-
-            // Organizar os canais por grupo
-            loadData.forEach((stream) => {
-              if (!groups[stream.group]) {
-                groups[stream.group] = [];
-              }
-              groups[stream.group].push(stream);
-            });
-
-            // Criar as pastas (grupos) e adicionar canais
-            Object.keys(groups).forEach((group) => {
-              const groupDiv = document.createElement("div");
-              groupDiv.classList.add("group");
-
-              const groupHeader = document.createElement("h2");
-              groupHeader.textContent = group;
-              groupHeader.classList.add("group-title");
-              groupHeader.onclick = function () {
-                // Remove a classe 'selected' de todas as divs
-                const allGroups = document.querySelectorAll(".group"); // Substitua '.groupDiv' pela sua classe real
-                allGroups.forEach((group) =>
-                  group.classList.remove("selected")
-                );
-
-                // Adiciona a classe 'selected' apenas ao item clicado
-                toggleChannelList(group); // Função para alternar a lista de canais
-                groupDiv.classList.add("selected");
-              };
-
-              groupDiv.appendChild(groupHeader);
-              channelsDiv.appendChild(groupDiv);
-            });
-
-            loadProgramacao();
-          })
-          .catch((error) => {
-            console.error("Erro ao carregar os canais:", error);
-          });
-      }
-
-      // Função para alternar a exibição da lista de canais
-      function toggleChannelList(group) {
-        const channelList = document.getElementById("channel-list");
-
-        // Remove todos os filhos existentes de maneira eficiente
-        channelList.replaceChildren();
-
-        groups[group].forEach((stream) => {
-          const channelDiv = document.createElement("div");
-          channelDiv.classList.add("channel");
-
-          const logo = document.createElement("img");
-          logo.src = stream.logo;
-          logo.alt = stream.name;
-          logo.classList.add("channel-logo");
-
-          const name = document.createElement("h3");
-          name.textContent = stream.name;
-          name.classList.add("channel-name");
-          channelDiv.onclick = function () {
-            // Remove a classe 'selected' de todas as divs, exceto a atual
-            const allGroups = document.querySelectorAll(".channel");
-            allGroups.forEach((group) => {
-              if (group !== channelDiv) {
-                group.classList.remove("selected");
-              }
-            });
-
-            // Adiciona a classe 'selected' ao elemento clicado, se ainda não estiver
-            if (!channelDiv.classList.contains("selected")) {
-              loadStream(stream.url);
-              setUpProgramacao(stream.id); // Carregar a programação do canal
-              channelDiv.classList.add("selected");
-            }
-          };
-
-          const vivo = document.createElement("div");
-          vivo.textContent = "AO VIVO";
-          vivo.classList.add("vivo");
-          channelDiv.appendChild(logo);
-          channelDiv.appendChild(name);
-          channelDiv.appendChild(vivo);
-          channelList.appendChild(channelDiv);
-        });
-      }
-
-      // Função para carregar a programação de um canal
-      // Função para carregar a programação de um canal
-      function loadProgramacao() {
-        fetch("/programacao")
-          .then((response) => response.json())
-          .then((data) => {
-            programacaoData = data;
-          })
-          .catch((error) => {
-            console.error("Erro ao carregar a programação:", error);
-          });
-      }
-
-      function normalizeName(name) {
-        // Remover espaços extras, caracteres especiais e converter para minúsculas
-        return name.replace(/\s+/g, '').replace(/[^\w\s]/g, '').toLowerCase();
-      }
-
-
-      function setUpProgramacao(canal) {
-        console.log(canal);
-
-        const programacaoDiv = document.getElementById("programacao");
-
-        // Filtrar a programação para o canal selecionado, normalizando os nomes
-        const canalProgramacao = programacaoData.filter(
-          (prog) => normalizeName(prog.canal) === normalizeName(canal)
-        );
-
-        // Obter a data e hora atual
-        const now = moment(); // Usando moment.js para lidar com a data atual
-
-        // Ordenar a programação (opcional, se quiser manter a ordem cronológica)
-        canalProgramacao.sort((a, b) =>
-          moment(a.inicio, "DD/MM/YYYY HH:mm:ss").isBefore(
-            moment(b.inicio, "DD/MM/YYYY HH:mm:ss")
-          )
-            ? -1
-            : 1
-        );
-
-        programacaoDiv.innerHTML = ""; // Limpar conteúdo anterior
-
-        // Iterar sobre a programação e exibir a partir do programa atual
-        canalProgramacao.forEach((prog) => {
-          const start = moment(prog.inicio, "DD/MM/YYYY HH:mm:ss"); // Horário de início
-          const end = moment(prog.fim, "DD/MM/YYYY HH:mm:ss"); // Horário de fim
-
-          // Verificar se o programa é atual ou futuro
-          if (start.isBefore(now) && end.isAfter(now)) {
-            // Programa atual
-            createProgramDiv(prog, true, now, start, end);
-          } else if (start.isAfter(now)) {
-            // Programa futuro
-            createProgramDiv(prog, false);
-          }
-        });
-
-        // Função para criar as divs dos programas
-        function createProgramDiv(prog, isCurrent, now, start, end) {
-          const progDiv = document.createElement("div");
-          progDiv.classList.add("programa");
-
-          if (isCurrent) {
-            progDiv.classList.add("programa-atual"); // Classe CSS para o programa atual
-          } else {
-            progDiv.classList.add("programa-proximo"); // Classe CSS para o programa futuro
-          }
-
-          const titulo = document.createElement("h4");
-          titulo.textContent = prog.programa;
-          progDiv.appendChild(titulo);
-
-          const descricao = document.createElement("p");
-          descricao.textContent = prog.descricao;
-          progDiv.appendChild(descricao);
-
-          const horario = document.createElement("p");
-          horario.textContent = `Início: ${prog.inicio} | Fim: ${prog.fim}`;
-          progDiv.appendChild(horario);
-
-          const rating = document.createElement("p");
-          progDiv.appendChild(rating);
-          setRating(prog, rating);
-
-          // Barra de progresso
-          if (isCurrent) {
-            const progressBarContainer = document.createElement("div");
-            progressBarContainer.classList.add("progress-bar-container");
-
-            const progressBar = document.createElement("div");
-            progressBar.classList.add("progress-bar");
-
-            const duration = end.diff(start); // Duração do programa em milissegundos
-            const elapsed = now.diff(start); // Tempo decorrido desde o início do programa
-
-            // Calcular o progresso (porcentagem)
-            const progress = Math.min((elapsed / duration) * 100, 100);
-            progressBar.style.width = `${progress}%`; // Atualizar a largura da barra
-
-            progressBarContainer.appendChild(progressBar);
-            progDiv.appendChild(progressBarContainer);
-
-            // Atualizar a barra de progresso a cada segundo
-            const interval = setInterval(() => {
-              const newElapsed = moment().diff(start);
-              const newProgress = Math.min((newElapsed / duration) * 100, 100);
-              progressBar.style.width = `${newProgress}%`;
-
-              if (newProgress >= 100) {
-                clearInterval(interval); // Parar a atualização quando a barra atingir 100%
-                setUpProgramacao(canal);
-              }
-            }, 1000); // Atualizar a cada segundo
-          }
-
-          programacaoDiv.appendChild(progDiv);
-        }
-      }
-
-      function setRating(programacao, rating) {
-        if (programacao.rating !== undefined && programacao.rating !== null) {
-          const valorRating = String(programacao.rating).replace(/\[|\]/g, "");
-
-          // Define o texto de classificação
-          rating.textContent = `Classificação: `;
-
-          // Cria uma div para o quadrado de cor
-          const colorDiv = document.createElement("div");
-          colorDiv.style.width = "30px"; // Aumenta o tamanho para acomodar o texto
-          colorDiv.style.height = "30px";
-          colorDiv.style.display = "inline-flex"; // Para centralizar o texto
-          colorDiv.style.alignItems = "center"; // Centraliza verticalmente
-          colorDiv.style.justifyContent = "center"; // Centraliza horizontalmente
-          colorDiv.style.marginLeft = "10px";
-          colorDiv.style.borderRadius = "4px"; // Deixa com cantos arredondados
-          colorDiv.style.color = "white"; // Define a cor do texto
-          colorDiv.style.fontWeight = "bold"; // Deixa o texto em negrito
-
-          // Aplica a cor com base na classificação indicativa
-          switch (valorRating.toLowerCase()) {
-            case "l":
-              colorDiv.style.backgroundColor = "green"; // Verde para "Livre"
-              break;
-            case "10":
-              colorDiv.style.backgroundColor = "blue"; // Azul para "10 anos"
-              break;
-            case "12":
-              colorDiv.style.backgroundColor = "yellow"; // Amarelo para "12 anos"
-              colorDiv.style.color = "black"; // Ajusta a cor do texto para contraste
-              break;
-            case "14":
-              colorDiv.style.backgroundColor = "orange"; // Laranja para "14 anos"
-              break;
-            case "16":
-              colorDiv.style.backgroundColor = "red"; // Vermelho para "16 anos"
-              break;
-            case "18":
-              colorDiv.style.backgroundColor = "darkred"; // Vermelho escuro para "18 anos"
-              break;
-          }
-
-          // Define o texto dentro da div colorida
-          colorDiv.textContent = valorRating;
-
-          // Adiciona a div colorida ao lado do texto de classificação
-          rating.appendChild(colorDiv);
-        } else {
-          rating.textContent = "Classificação: Não disponível";
-        }
-      }
-
-      function toggleDashControl() {
-        const dashControl = document.getElementById("dash-control");
-        dashControl.classList.toggle("active"); // Alterna a classe 'active'
-        const topbar = document.getElementById("topbar");
-        topbar.classList.toggle("active"); // Alterna a classe 'active'
-        getWeather();
-      }
-
-      document.addEventListener("keydown", function (event) {
-        if (event.key === "Escape") {
-          toggleDashControl(); // Chama a função ao pressionar ESC
-        }
-      });
-
-      // Exibe o painel automaticamente ao carregar, se necessário
-      window.addEventListener("load", () => {
-        const dashControl = document.getElementById("dash-control");
-        //dashControl.classList.remove("active"); // Garante que comece oculto
-      });
-
-      // Carregar canais quando a página for carregada
-      window.onload = loadChannels;
-
-      // Função para atualizar a hora e data
-      function updateDateTime() {
-        const date = new Date();
-        const options = {
-          weekday: "long",
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        };
-        const timeString = date.toLocaleTimeString();
-        const dateString = date.toLocaleDateString("pt-BR", options);
-
-        document.getElementById("time").innerText =
-          timeString + " " + dateString;
-      }
-
-      // Função para obter a previsão do tempo
-      async function getWeather() {
-        const apiKey = "955063c20b55d4a3d8e45d166c55524d"; // Substitua com sua chave da API
-        const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=Curitiba&appid=${apiKey}&lang=pt_br&units=metric`;
-
-        try {
-          const response = await fetch(apiUrl);
-          const data = await response.json();
-          const temp = data.main.temp;
-          document.getElementById("weather").innerText = `${temp}°C`;
-        } catch (error) {
-          document.getElementById("weather").innerText =
-            "Erro ao obter a previsão do tempo";
-        }
-      }
-
-      // Atualiza a hora e data a cada segundo
-      setInterval(updateDateTime, 1000);
-
-      // Chama a função de previsão do tempo ao carregar
-      getWeather();
-    </script>
-  </body>
 </html>
