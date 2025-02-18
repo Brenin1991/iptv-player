@@ -9,31 +9,21 @@
 </head>
 
 <body>
-  <div id="topbar" class="topbar active">
-    <div class="left">
-    </div>
-
-    <div class="center">
-      <div class="time" id="time"></div>
-      <div class="date" id="date"></div>
-      <div class="weather" id="weather"></div>
-    </div>
-
-    <div class="right">
-      <div class="icons">
-        <a href="#" class="icon"><img src="setting.png" alt="Configurações" /></a>
-        <a onclick="switchToLogin()" class="icon"><img src="user.png" alt="Perfil" /></a>
-      </div>
-    </div>
-  </div>
+  
   <div id="login">
     <div class="container">
       <h1>Quem está assistindo?</h1>
       <div class="user-container" id="userContainer">
-        
+        <!-- Usuários serão carregados aqui -->
+      </div>
+      <!-- Contêiner para os botões de ação -->
+      <div id="actionButtons" style="display: none;">
+        <button id="enterButton"></button>
+        <button id="removeButton">Remover Usuário</button>
       </div>
     </div>
   </div>
+  
   
   
   <!-- Pop-up para adicionar usuário -->
@@ -79,6 +69,22 @@
     <div class="notification-content">
       <span id="notificationMessage"></span>
       <button id="closeNotificationButton" onclick="fecharNotificacao()">X</button>
+    </div>
+  </div>
+
+  <div id="topbar" class="topbar active">
+    <div class="left">
+      <div class="time" id="time"></div>
+    </div>
+
+    <div class="center">
+      
+      <div class="date" id="date"></div>
+      
+    </div>
+
+    <div class="right">
+      <div class="weather" id="weather"></div>
     </div>
   </div>
 

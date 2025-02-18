@@ -425,34 +425,74 @@ function switchToLogin() {
     try {
       const resposta = await fetch("http://localhost:3000/usuarios");
       const usuarios = await resposta.json();
-
+  
       const userContainer = document.getElementById("userContainer");
       userContainer.innerHTML = ""; // Limpa os usuários existentes
-
+  
       usuarios.forEach(usuario => {
         const userDiv = document.createElement("div");
         userDiv.classList.add("user");
-        userDiv.onclick = () => selecionarUsuario(usuario.id, usuario.nome);
-
+        userDiv.onclick = () => exibirAcoesUsuario(usuario);
+  
         userDiv.innerHTML = `
           <img src="/icons/${usuario.icone}" alt="${usuario.nome}">
           <p>${usuario.nome}</p>
         `;
-
+  
         userContainer.appendChild(userDiv);
       });
-
+  
       // Adiciona o botão de adicionar usuário no final
       const addUserDiv = document.createElement("div");
       addUserDiv.classList.add("user", "add-user");
       addUserDiv.onclick = addUser;
       addUserDiv.textContent = "+";
       userContainer.appendChild(addUserDiv);
-
+  
     } catch (error) {
       console.error("Erro ao carregar usuários:", error);
     }
   }
+  
+  function exibirAcoesUsuario(usuario) {
+    // Remover a classe 'selected' de todos os usuários
+    document.querySelectorAll('.user').forEach(user => {
+      user.classList.remove('selected');
+    });
+
+    // Exibir os botões de ação
+    const actionButtons = document.getElementById('actionButtons');
+    actionButtons.style.display = 'block';
+  
+    // Atualizar o texto e eventos dos botões
+    const enterButton = document.getElementById('enterButton');
+    enterButton.textContent = `Entrar com ${usuario.nome}`;
+    enterButton.onclick = () => selecionarUsuario(usuario.id, usuario.nome);
+  
+    const removeButton = document.getElementById('removeButton');
+    removeButton.onclick = () => removerUsuario(usuario.id);
+  }
+  
+  async function removerUsuario(id) {
+    if (confirm("Tem certeza que deseja remover este usuário?")) {
+      try {
+        const resposta = await fetch(`http://localhost:3000/usuarios/${id}`, {
+          method: 'DELETE',
+        });
+  
+        if (resposta.ok) {
+          console.log(`Usuário com ID ${id} removido com sucesso.`);
+          carregarUsuarios(); // Recarrega a lista de usuários após a remoção
+          document.getElementById('actionButtons').style.display = 'none'; // Esconde os botões de ação
+        } else {
+          console.error(`Erro ao remover usuário com ID ${id}.`);
+        }
+      } catch (error) {
+        console.error("Erro ao remover usuário:", error);
+      }
+    }
+  }
+  
 
   function selecionarUsuario(id, nome) {
     localStorage.setItem("usuario_id", id);

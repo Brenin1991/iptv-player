@@ -239,7 +239,7 @@ h1 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0;
+  padding: 10px 0;
   color: white;
   position: fixed;
   top: -100px;
@@ -247,20 +247,13 @@ h1 {
   width: 100%;
   z-index: 1000;
   gap: 10px;
-  background: linear-gradient(to top,
-      rgba(0, 0, 0, 0.5),
-      rgba(0, 0, 0, 0.4),
-      rgba(0, 0, 0, 0.3),
-      rgba(0, 0, 0, 0.2),
-      rgba(0, 0, 0, 0.1));
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  transition: top 0.5s ease-in-out;
+  
   z-index: 1000;
 }
 
 #topbar.active {
   top: 0;
+  height: 35px;
 }
 
 .topbar .left,
@@ -312,6 +305,8 @@ h1 {
   font-weight: bold;
   font-size: 25px;
   margin-left: 25px;
+  position: absolute;
+  right: 15px;
 }
 
 .right .icons {
@@ -363,7 +358,7 @@ h1 {
 }
 .add-user {
   font-size: 50px;
-  background: #333;
+  background: #ffffff;
   width: 120px;
   height: 120px;
   display: flex;
@@ -375,6 +370,7 @@ h1 {
 }
 .add-user:hover {
   background: #555;
+  color: white;
 }
 
 #login {
@@ -551,19 +547,24 @@ h1 {
 }
 
 .icon {
-  width: 100px;
+  width: 90px;
   height: auto;
-  margin: 10px;
+  margin: 5px 0;
+  border-radius: 5px;
 }
 
 .icon img{
-  width: 100px;
+  width: 90px;
   height: auto;
+  border-radius: 5px;
 }
 
 #iconContainer {
-  display: inline-flex;
-  margin: 10px;
+  display: grid;
+  margin: 6px 0;
+  grid-template-columns: repeat(auto-fit, 105px);
+  justify-content: center;
+  justify-items: center;
 }
 
 /* Estilo da tela de carregamento */
@@ -577,7 +578,7 @@ h1 {
   display: none; /* Inicialmente invisível */
   justify-content: center;
   align-items: center;
-  z-index: 9999; /* Para garantir que fique sobre outros elementos */
+  z-index: 999; /* Para garantir que fique sobre outros elementos */
 }
 
 /* Estilo do ícone de carregamento (spinner) */
@@ -594,6 +595,42 @@ h1 {
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+#actionButtons {
+  position: absolute;
+  bottom: 35px;
+}
+
+#actionButtons button {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.3s;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+/* Botão Cancelar */
+#actionButtons button:first-child {
+  background: #333;
+  color: white;
+}
+
+#actionButtons button:first-child:hover {
+  background: #444;
+}
+
+/* Botão Adicionar */
+#actionButtons button:last-child {
+  background: #ffffff; /* Vermelho Netflix */
+  color: rgb(0, 0, 0);
+}
+
+#actionButtons button:last-child:hover {
+  background: #ff0a16; /* Tom mais claro no hover */
 }
 
 

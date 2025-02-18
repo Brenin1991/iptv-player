@@ -33,13 +33,13 @@ if (!fs.existsSync(pastaListas)) {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "src")));
 app.use("/listas", express.static(path.join(__dirname, "listas")));
 app.use("/icons", express.static(path.join(__dirname, "assets/icons")));
 
 
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
+  res.sendFile(path.join(__dirname, "src", "index.html"));
 });
 
 function lerListaM3U(caminhoArquivo) {
@@ -284,8 +284,24 @@ app.get("/icones", (req, res) => {
   });
 });
 
+// Rota para deletar um usuário pelo ID
+app.delete('/usuarios/:id', (req, res) => {
+  const userId = req.params.id;
+
+  db.run("DELETE FROM usuarios WHERE id = ?", [userId], function(err) {
+    if (err) {
+      return res.status(500).json({ error: "Erro ao deletar usuário" });
+    }
+    if (this.changes === 0) {
+      return res.status(404).json({ error: "Usuário não encontrado" });
+    }
+    res.json({ message: "Usuário deletado com sucesso!" });
+  });
+});
 
 
-app.listen(port, '0.0.0.0', () => {
+
+
+app.listen(port, '127.0.0.1', () => {
   console.log(`Servidor rodando em http://0.0.0.0:${port}`);
 });
