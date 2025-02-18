@@ -9,9 +9,6 @@
 </head>
 
 <body>
-  <video id="iptvPlayer" width="100%" controls>
-    Seu navegador não suporta o elemento de vídeo.
-  </video>
   <div id="topbar" class="topbar active">
     <div class="left">
     </div>
@@ -25,19 +22,66 @@
     <div class="right">
       <div class="icons">
         <a href="#" class="icon"><img src="setting.png" alt="Configurações" /></a>
-        <a href="#" class="icon"><img src="user.png" alt="Perfil" /></a>
+        <a onclick="switchToLogin()" class="icon"><img src="user.png" alt="Perfil" /></a>
       </div>
     </div>
   </div>
-  <div id="dash-control" class="active">
-    <div id="channelsContainer">
-    </div>
-
-    <div id="channel-list">
-    </div>
-    <div id="programacao">
+  <div id="login">
+    <div class="container">
+      <h1>Quem está assistindo?</h1>
+      <div class="user-container" id="userContainer">
+        
+      </div>
     </div>
   </div>
+  
+  
+  <!-- Pop-up para adicionar usuário -->
+  <div id="popup" class="popup">
+    <div class="popup-content">
+      <h2>Adicionar Usuário</h2>
+      <input type="text" id="nomeUsuario" placeholder="Nome do usuário">
+      <input type="text" id="urlM3U" placeholder="URL da Lista M3U">
+      
+      <div class="icon-selection">
+        <h3>Escolha um ícone</h3>
+        <div id="iconContainer"></div>
+      </div>
+  
+      <div class="popup-buttons">
+        <button onclick="fecharPopup()">Cancelar</button>
+        <button onclick="cadastrarUsuario()">Adicionar</button>
+      </div>
+    </div>
+  </div>
+  <div id="config"></div>
+  <div id="dashboard">
+    <video id="iptvPlayer" width="100%" controls>
+      Seu navegador não suporta o elemento de vídeo.
+    </video>
+
+    <div id="dash-control" class="active">
+      <div id="channelsContainer">
+      </div>
+
+      <div id="channel-list">
+      </div>
+      <div id="programacao">
+      </div>
+    </div>
+  </div>
+
+  <!-- Tela de carregamento -->
+  <div id="loadingOverlay" class="loading-overlay">
+    <div class="loading-spinner"></div>
+  </div>
+  <div id="notificationPopup" class="notification-popup">
+    <div class="notification-content">
+      <span id="notificationMessage"></span>
+      <button id="closeNotificationButton" onclick="fecharNotificacao()">X</button>
+    </div>
+  </div>
+
 
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>

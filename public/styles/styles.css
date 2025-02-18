@@ -60,7 +60,7 @@ h1 {
   height: 60vh;
   display: flex;
   gap: 10px;
-  padding: 10px;
+  padding: 10px 0;
   border-radius: 10px;
   background: linear-gradient(to top,
       rgba(0, 0, 0, 1),
@@ -328,3 +328,274 @@ h1 {
   width: 20px;
   height: 20px;
 }
+
+.user-container {
+  display: inline-flex;
+  gap: 20px;
+}
+.user {
+  width: 120px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.user p {
+  color: aliceblue;
+}
+
+#login h1 {
+  color: aliceblue;
+}
+
+.user img {
+  width: 100%;
+  border-radius: 10px;
+  transition: transform 0.2s;
+}
+.user img:hover {
+  transform: scale(1.1);
+}
+.add-user {
+  font-size: 50px;
+  background: #333;
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+.add-user:hover {
+  background: #555;
+}
+
+#login {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+}
+
+#config, #dashboard {
+  width: 100vw;
+}
+
+/* Estilo inicial da tela de login */
+#login {
+  transition: opacity 1s ease-out, background-color 1s ease-out;
+  opacity: 1;
+}
+
+#login.fade-out {
+  opacity: 0;
+  background-color: rgba(0, 0, 0, 0.8); /* cor escura */
+}
+
+#login.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Configuração da transição da tela do dashboard */
+#dashboard {
+  opacity: 0;
+  pointer-events: none; /* Evita interação até a animação acabar */
+  transition: opacity 1s ease-in-out;
+}
+
+#dashboard.fade-out {
+  opacity: 0;
+  background-color: rgba(0, 0, 0, 0.8); /* cor escura */
+}
+
+#dashboard.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+
+
+/* Fundo escuro para o pop-up */
+.popup {
+  display: none; /* Inicialmente escondido */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Caixa central do pop-up */
+.popup-content {
+  background: #141414; /* Preto Netflix */
+  padding: 30px 10px 30px;
+  border-radius: 8px;
+  text-align: center;
+  width: 350px;
+  color: white;
+  font-family: Arial, sans-serif;
+  width: 500px;
+}
+
+/* Título */
+.popup-content h2 {
+  margin-bottom: 15px;
+  font-size: 22px;
+  color: #ffffff; /* Vermelho Netflix */
+}
+
+/* Campo de entrada */
+.popup-content input {
+  width: 100%;
+  padding: 12px 0;
+  margin-bottom: 20px;
+  border: 1px solid #333;
+  border-radius: 5px;
+  background: #222;
+  color: white;
+  font-size: 16px;
+  text-align: center;
+  outline: none;
+}
+
+.popup-content input::placeholder {
+  color: #bbb;
+}
+
+/* Botões */
+.popup-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.popup-buttons button {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.3s;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+/* Botão Cancelar */
+.popup-buttons button:first-child {
+  background: #333;
+  color: white;
+}
+
+.popup-buttons button:first-child:hover {
+  background: #444;
+}
+
+/* Botão Adicionar */
+.popup-buttons button:last-child {
+  background: #ffffff; /* Vermelho Netflix */
+  color: rgb(0, 0, 0);
+}
+
+.popup-buttons button:last-child:hover {
+  background: #ff0a16; /* Tom mais claro no hover */
+}
+
+/* Estilos para o Popup de Notificação */
+.notification-popup {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 15px;
+  border-radius: 8px;
+  display: none; /* Começa oculto */
+  z-index: 1000;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+.notification-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#closeNotificationButton {
+  background: none;
+  color: white;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+#closeNotificationButton:hover {
+  color: red;
+}
+
+.icon {
+  width: 100px;
+  height: auto;
+  margin: 10px;
+}
+
+.icon img{
+  width: 100px;
+  height: auto;
+}
+
+#iconContainer {
+  display: inline-flex;
+  margin: 10px;
+}
+
+/* Estilo da tela de carregamento */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8); /* Tela escura com opacidade */
+  display: none; /* Inicialmente invisível */
+  justify-content: center;
+  align-items: center;
+  z-index: 9999; /* Para garantir que fique sobre outros elementos */
+}
+
+/* Estilo do ícone de carregamento (spinner) */
+.loading-spinner {
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top: 4px solid #fff;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+}
+
+/* Animação do giro */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+
+
+

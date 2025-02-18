@@ -9,6 +9,9 @@ let groups = {};
 let loadData;
 let programacaoData = [];
 
+document.getElementById("dashboard").classList.add("hidden");
+document.getElementById("config").classList.add("hidden");
+
 function loadStream(url) {
     if (Hls.isSupported()) {
         var hls = new Hls();
@@ -19,12 +22,13 @@ function loadStream(url) {
     }
 }
 
-function loadChannels() {
-    fetch("/streams")
+function loadChannels(userId) {
+    fetch(`/streams/${userId}`)
         .then((response) => response.json())
         .then((data) => {
             loadData = data;
             const channelsDiv = document.getElementById("channelsContainer");
+            channelsDiv.innerHTML = '';
 
             loadData.forEach((stream) => {
                 if (!groups[stream.group]) {
@@ -63,6 +67,7 @@ function loadChannels() {
 
 function toggleChannelList(group) {
     const channelList = document.getElementById("channel-list");
+    channelList.innerHTML = '';
 
     channelList.replaceChildren();
 
@@ -310,3 +315,180 @@ async function getWeather() {
 
 setInterval(updateDateTime, 1000);
 getWeather();
+
+function abrirPopup() {
+    document.getElementById("popup").style.display = "flex";
+}
+
+function fecharPopup() {
+    document.getElementById("popup").style.display = "none";
+}
+
+// Função para carregar os ícones disponíveis
+function carregarIcones() {
+    fetch("/icones")
+      .then(response => response.json())
+      .then(icons => {
+        const iconContainer = document.getElementById("iconContainer");
+        icons.forEach(icon => {
+          const iconDiv = document.createElement("div");
+          iconDiv.classList.add("icon");
+          iconDiv.innerHTML = `<img src="/icons/${icon}" alt="${icon}">`;
+          iconDiv.onclick = () => selecionarIcone(icon);
+          iconContainer.appendChild(iconDiv);
+        });
+      })
+      .catch(error => {
+        console.error("Erro ao carregar os ícones:", error);
+      });
+  }
+  
+  // Função para selecionar um ícone
+  let iconeSelecionado = "";
+  function selecionarIcone(icone) {
+    iconeSelecionado = icone;
+    const selectedIcon = document.querySelector(".selected");
+    if (selectedIcon) {
+      selectedIcon.classList.remove("selected");
+    }
+    const newSelectedIcon = document.querySelector(`[alt="${icone}"]`).parentElement;
+    newSelectedIcon.classList.add("selected");
+  }
+  
+  // Função de cadastro de usuário
+  function cadastrarUsuario() {
+    const nome = document.getElementById("nomeUsuario").value;
+    const listaM3U = document.getElementById("urlM3U").value;
+    
+    if (!nome || !listaM3U || !iconeSelecionado) {
+      alert("Por favor, preencha todos os campos e escolha um ícone.");
+      return;
+    }
+  
+    const usuario = {
+      nome: nome,
+      lista_m3u: listaM3U,
+      icone: iconeSelecionado
+    };
+
+    document.getElementById("loadingOverlay").style.display = "flex";
+  
+    fetch("/cadastrar", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(usuario)
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log(data);
+      fecharPopup();
+      carregarUsuarios();
+      document.getElementById("loadingOverlay").style.display = "none";
+    })
+    .catch(error => {
+      console.error("Erro ao cadastrar usuário:", error);
+    });
+  }
+  
+  // Chamar a função para carregar ícones ao abrir o pop-up
+  carregarIcones();
+  
+
+function switchToDashboard() {
+    document.getElementById('login').classList.add('fade-out');
+    document.getElementById("loadingOverlay").style.display = "flex";
+    setTimeout(function() {
+      document.getElementById('login').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'flex';
+      document.getElementById('dashboard').classList.add('active');
+      document.getElementById("loadingOverlay").style.display = "none";
+    }, 5000);
+  }
+
+
+function switchToLogin() {
+    // Adiciona o efeito de fade escuro na tela de login
+    document.getElementById('dashboard').classList.add('fade-out');
+    
+    // Após o fade escuro, faz a transição para o dashboard
+    setTimeout(function() {
+      // Esconde a tela de login e mostra o dashboard
+      // Recarrega a página
+        location.reload();
+
+    }, 1000); // Tempo para a animação do fade escuro (1 segundo)
+  }
+
+  async function carregarUsuarios() {
+    try {
+      const resposta = await fetch("http://localhost:3000/usuarios");
+      const usuarios = await resposta.json();
+
+      const userContainer = document.getElementById("userContainer");
+      userContainer.innerHTML = ""; // Limpa os usuários existentes
+
+      usuarios.forEach(usuario => {
+        const userDiv = document.createElement("div");
+        userDiv.classList.add("user");
+        userDiv.onclick = () => selecionarUsuario(usuario.id, usuario.nome);
+
+        userDiv.innerHTML = `
+          <img src="/icons/${usuario.icone}" alt="${usuario.nome}">
+          <p>${usuario.nome}</p>
+        `;
+
+        userContainer.appendChild(userDiv);
+      });
+
+      // Adiciona o botão de adicionar usuário no final
+      const addUserDiv = document.createElement("div");
+      addUserDiv.classList.add("user", "add-user");
+      addUserDiv.onclick = addUser;
+      addUserDiv.textContent = "+";
+      userContainer.appendChild(addUserDiv);
+
+    } catch (error) {
+      console.error("Erro ao carregar usuários:", error);
+    }
+  }
+
+  function selecionarUsuario(id, nome) {
+    localStorage.setItem("usuario_id", id);
+    localStorage.setItem("usuario_nome", nome);
+    mostrarNotificacao(`Usuário ${nome} selecionado!`);
+    loadChannels(id);
+    switchToDashboard();
+    
+    // Aqui você pode redirecionar ou carregar outra página
+  }
+
+  function addUser() {
+    abrirPopup();
+  }
+
+  // Carrega os usuários ao carregar a página
+  window.onload = carregarUsuarios;
+
+  fecharPopup();
+
+  function mostrarNotificacao(mensagem) {
+    const popup = document.getElementById("notificationPopup");
+    const messageElement = document.getElementById("notificationMessage");
+    messageElement.textContent = mensagem;
+    
+    popup.style.display = "block"; // Exibe o popup
+    
+    // Fechar automaticamente após 3 segundos
+    setTimeout(() => {
+      fecharNotificacao();
+    }, 3000);
+  }
+
+  // Fecha a notificação manualmente ao clicar no "X"
+  function fecharNotificacao() {
+    const popup = document.getElementById("notificationPopup");
+    popup.style.display = "none";
+  }
+  

@@ -4,6 +4,8 @@ const fs = require("fs");
 const m3u8Parser = require("m3u8-parser");
 const { createProxyMiddleware } = require("http-proxy-middleware");
 const xml2js = require("xml2js");
+const sqlite3 = require("sqlite3").verbose();
+const axios = require("axios");
 
 const app = express();
 const port = 3000;
@@ -23,7 +25,18 @@ app.use(
   })
 );
 
+const pastaListas = path.join(__dirname, "listas");
+if (!fs.existsSync(pastaListas)) {
+  fs.mkdirSync(pastaListas, { recursive: true });
+}
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 app.use(express.static(path.join(__dirname, "public")));
+app.use("/listas", express.static(path.join(__dirname, "listas")));
+app.use("/icons", express.static(path.join(__dirname, "assets/icons")));
+
 
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
@@ -70,14 +83,37 @@ function lerListaM3U(caminhoArquivo) {
   });
 }
 
-app.get("/streams", async (req, res) => {
+app.get("/streams/:id", async (req, res) => {
+  const userId = req.params.id; // Recebe o ID do usuário da URL
+
   try {
-    const streams = await lerListaM3U("assets/lista.m3u");
-    res.json(streams);
+    // Primeiro, buscar o nome do arquivo M3U no banco de dados
+    db.get("SELECT lista_m3u FROM usuarios WHERE id = ?", [userId], async (err, row) => {
+      if (err) {
+        return res.status(500).json({ error: "Erro ao buscar usuário no banco de dados" });
+      }
+
+      if (!row) {
+        return res.status(404).json({ error: "Usuário não encontrado" });
+      }
+
+      const nomeArquivo = row.lista_m3u; // Nome do arquivo M3U salvo no banco
+
+      // Agora, busca o arquivo M3U na pasta 'listas'
+      const caminhoArquivo = path.join(__dirname, "listas", nomeArquivo);
+
+      try {
+        const streams = await lerListaM3U(caminhoArquivo); // Chama a função para ler o arquivo
+        res.json(streams); // Retorna os dados da lista M3U
+      } catch (error) {
+        res.status(500).json({ error: "Erro ao carregar os streams da lista" });
+      }
+    });
   } catch (error) {
-    res.status(500).json({ error: "Erro ao carregar os streams" });
+    res.status(500).json({ error: "Erro ao buscar streams" });
   }
 });
+
 
 function lerListaXMLTV(caminhoArquivo) {
   return new Promise((resolve, reject) => {
@@ -149,6 +185,106 @@ app.get("/programacao", async (req, res) => {
     res.status(500).json({ error: "Erro ao carregar a programação" });
   }
 });
+
+
+// 📌 Conectar ao banco SQLite
+const db = new sqlite3.Database("usuarios.db", (err) => {
+  if (err) {
+    console.error("Erro ao conectar ao banco de dados:", err.message);
+  } else {
+    console.log("Banco de dados conectado.");
+
+    // Alterar a tabela para incluir a coluna 'icone'
+    db.run(`
+      CREATE TABLE IF NOT EXISTS usuarios (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nome TEXT NOT NULL,
+        lista_m3u TEXT NOT NULL,
+        icone TEXT NOT NULL
+      )
+    `, (err) => {
+      if (err) {
+        console.error("Erro ao criar ou alterar a tabela:", err.message);
+      } else {
+        console.log("Tabela 'usuarios' criada ou atualizada com sucesso.");
+      }
+    });
+  }
+});
+
+async function validarEGuardarM3U(url) {
+  try {
+    console.log(`Baixando lista de: ${url}`);
+
+    const resposta = await axios.get(url, { timeout: 10000 }); // 10s de timeout
+
+    if (!resposta.data.includes("#EXTINF")) throw new Error("Lista M3U inválida");
+
+    // Gerar um nome aleatório para a lista
+    const nomeArquivo = `lista_${Date.now()}_${Math.floor(Math.random() * 10000)}.m3u`;
+    const caminhoArquivo = path.join(pastaListas, nomeArquivo);
+
+    // Salvar a lista no servidor
+    fs.writeFileSync(caminhoArquivo, resposta.data, "utf8");
+
+    console.log(`Lista salva em: ${caminhoArquivo}`);
+    return nomeArquivo;
+  } catch (err) {
+    console.error("Erro ao baixar a lista:", err.message);
+    throw new Error(`Erro ao baixar a lista M3U: ${err.message}`);
+  }
+}
+
+// 📌 Rota para cadastrar usuário e salvar a lista M3U
+app.post("/cadastrar", async (req, res) => {
+  const { nome, lista_m3u, icone } = req.body;
+
+  if (!nome || !lista_m3u || !icone) {
+    return res.status(400).json({ error: "Nome, URL da lista e ícone são obrigatórios" });
+  }
+
+  try {
+    const arquivoM3U = await validarEGuardarM3U(lista_m3u);
+
+    db.run(
+      "INSERT INTO usuarios (nome, lista_m3u, icone) VALUES (?, ?, ?)",
+      [nome, arquivoM3U, icone],
+      function (err) {
+        if (err) {
+          return res.status(500).json({ error: "Erro ao salvar no banco" });
+        }
+        res.json({ message: "Usuário cadastrado com sucesso!", id: this.lastID });
+      }
+    );
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+
+app.get("/usuarios", (req, res) => {
+  db.all("SELECT id, nome, icone FROM usuarios", (err, rows) => {
+    if (err) {
+      return res.status(500).json({ error: "Erro ao buscar usuários" });
+    }
+    res.json(rows);
+  });
+});
+
+// Rota para listar os ícones
+app.get("/icones", (req, res) => {
+  const iconDir = path.join(__dirname, "assets", "icons");
+  fs.readdir(iconDir, (err, files) => {
+    if (err) {
+      return res.status(500).json({ error: "Erro ao carregar ícones." });
+    }
+    // Filtra apenas arquivos de imagem
+    const icons = files.filter(file => file.endsWith(".png") || file.endsWith(".jpg"));
+    res.json(icons);
+  });
+});
+
+
 
 app.listen(port, '0.0.0.0', () => {
   console.log(`Servidor rodando em http://0.0.0.0:${port}`);

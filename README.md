@@ -50,6 +50,10 @@ npm start
 Caso haja uma interface web:
 Acesse no navegador: `http://localhost:3000`
 
+![Interface do player](assets/05.png)
+
+![Interface do player](assets/04.png)
+
 ![Interface do player](assets/01.png)
 
 ![Interface do player](assets/02.png)
@@ -58,6 +62,12 @@ Acesse no navegador: `http://localhost:3000`
 
 ## Observações Importantes
 Este aplicativo é apenas um player para o protocolo IPTV e **não fornece canais ou listas IPTV**. O usuário deve possuir e carregar suas próprias listas M3U. O projeto **não viola nenhum direito autoral**, pois apenas reproduz os conteúdos que o próprio usuário fornecer.
+
+## Listas m3u
+Para quem busca listas m3u, segue o repositório abaixo
+
+[iptv-org](https://github.com/iptv-org/)
+
 
 ## Contribuição
 Sinta-se à vontade para abrir issues e enviar pull requests!
