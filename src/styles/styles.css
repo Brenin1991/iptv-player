@@ -524,7 +524,7 @@ h1 {
   padding: 15px;
   border-radius: 8px;
   display: none; /* Começa oculto */
-  z-index: 1000;
+  z-index: 99999;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
 }
 
@@ -578,7 +578,7 @@ h1 {
   display: none; /* Inicialmente invisível */
   justify-content: center;
   align-items: center;
-  z-index: 999; /* Para garantir que fique sobre outros elementos */
+  z-index: 9999; /* Para garantir que fique sobre outros elementos */
 }
 
 /* Estilo do ícone de carregamento (spinner) */

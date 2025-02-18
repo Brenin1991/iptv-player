@@ -78,8 +78,8 @@ web_modules/
 .env.test.local
 .env.production.local
 .env.local
-.m3u
-.db
+*.m3u
+*.db
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache
