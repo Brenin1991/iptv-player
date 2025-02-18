@@ -1,6 +1,6 @@
 # IPTV Player - Node.js
 
-Este é um aplicativo é um player de vídeo/streaming desenvolvido em Node.js para reproduzir listas IPTV no formato M3U. Além disso, ele permite ler, criar e editar arquivos M3U, facilitando a gestão das listas de canais. 
+Este aplicativo é um player de vídeo/streaming desenvolvido em Node.js para reproduzir listas IPTV no formato M3U. Além disso, ele permite ler, criar e editar arquivos M3U, facilitando a gestão das listas de canais. 
 
 ## Funcionalidades
 - Carregamento de listas M3U
