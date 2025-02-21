@@ -12,21 +12,29 @@ body {
   font-family: "Raleway-Variable", sans-serif;
   text-align: center;
   overflow: hidden;
-  background-color: rgb(29, 29, 29);
+  background: url('../bg.jpg') no-repeat center center fixed;
+  background-size: cover;
   user-select: none;
   padding: 0;
+  margin: 0;
   width: 100vw;
   height: 100vh;
   border: none;
 }
+
 
 h1 {
   text-align: center;
 }
 
 #iptvPlayer {
-  width: 100vw;
-  height: 100vh;
+  bottom: 0;
+  right: 0;
+  width: 95%;
+  height: auto;
+  z-index: 9999;
+  border-radius: 15px;
+  padding: 10px;
 }
 
 .group {
@@ -57,17 +65,16 @@ h1 {
   bottom: -100%;
   left: 0;
   width: 100vw;
-  height: 60vh;
+  height: 80vh;
   display: flex;
   gap: 10px;
   padding: 10px 0;
-  border-radius: 10px;
   background: linear-gradient(to top,
       rgba(0, 0, 0, 1),
       rgba(0, 0, 0, 0.9),
       rgba(0, 0, 0, 0.8),
       rgba(0, 0, 0, 0.7),
-      rgba(0, 0, 0, 0.5));
+      rgba(0, 0, 0, 0));
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   transition: bottom 0.5s ease-in-out;
@@ -80,17 +87,21 @@ h1 {
 
 
 #channelsContainer {
-  width: 15%;
+  width: 20%;
   height: 100%;
   overflow-y: auto;
   padding: 10px;
 }
 
 #programacao {
-  flex: 0.5;
   height: 100%;
   overflow-y: auto;
   padding: 10px;
+}
+
+#info-bar {
+  flex: 0.5;
+  height: 100%;
 }
 
 #programacao::-webkit-scrollbar {
@@ -130,7 +141,7 @@ h1 {
 }
 
 #channel-list {
-  flex: 1;
+  flex: 0.5;
   height: 100%;
   overflow-y: auto;
   padding: 10px;
@@ -155,7 +166,7 @@ h1 {
 }
 
 .channel {
-  height: 100px;
+  height: 80px;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -218,7 +229,7 @@ h1 {
 }
 
 .selected {
-  background-color: #ffffff;
+  background-color: white;
 }
 
 .group.selected h2 {
@@ -237,7 +248,7 @@ h1 {
 
 .topbar {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
   padding: 10px 0;
   color: white;
@@ -253,7 +264,18 @@ h1 {
 
 #topbar.active {
   top: 0;
-  height: 35px;
+  height: 50px;
+}
+
+#iptvPlayer.active {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  bottom: 121%;
+  left: 0;
+  margin: 0;
+  padding: 0;
+  border-radius: 0;
 }
 
 .topbar .left,
@@ -279,7 +301,7 @@ h1 {
 }
 
 .center {
-  flex-grow: 1;
+  flex-grow: 0.8;
   justify-content: center;
   text-align: center;
 }
@@ -289,7 +311,6 @@ h1 {
   font-weight: bold;
   font-size: 25px;
   margin-left: 25px;
-  position: absolute;
   left: 0;
 }
 
@@ -309,9 +330,15 @@ h1 {
   right: 15px;
 }
 
-.right .icons {
+.left .navbar-icon {
   display: flex;
   align-items: center;
+  margin-left: 20px;
+}
+
+.navbar-icon {
+  height: 35px;
+  width: auto;
 }
 
 .right .icon {
@@ -342,6 +369,7 @@ h1 {
 
 .user p {
   color: aliceblue;
+  font-weight: bold;
 }
 
 #login h1 {
@@ -350,7 +378,7 @@ h1 {
 
 .user img {
   width: 100%;
-  border-radius: 10px;
+  border-radius: 50%;
   transition: transform 0.2s;
 }
 .user img:hover {
@@ -364,7 +392,7 @@ h1 {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 10px;
+  border-radius: 50%;
   cursor: pointer;
   transition: background 0.3s;
 }
@@ -441,9 +469,9 @@ h1 {
 
 /* Caixa central do pop-up */
 .popup-content {
-  background: #141414; /* Preto Netflix */
-  padding: 30px 10px 30px;
-  border-radius: 8px;
+  background: #3f3f3f; /* Preto Netflix */
+  padding: 30px 30px 30px;
+  border-radius: 15px;
   text-align: center;
   width: 350px;
   color: white;
@@ -464,7 +492,7 @@ h1 {
   padding: 12px 0;
   margin-bottom: 20px;
   border: 1px solid #333;
-  border-radius: 5px;
+  border-radius: 15px;
   background: #222;
   color: white;
   font-size: 16px;
@@ -487,7 +515,7 @@ h1 {
   flex: 1;
   padding: 10px;
   border: none;
-  border-radius: 5px;
+  border-radius: 15px;
   cursor: pointer;
   transition: 0.3s;
   font-size: 16px;
@@ -549,19 +577,26 @@ h1 {
 .icon {
   width: 90px;
   height: auto;
-  margin: 5px 0;
-  border-radius: 5px;
+  margin: 5px 5px 5px;
+  border-radius: 50%;
 }
 
 .icon img{
   width: 90px;
   height: auto;
-  border-radius: 5px;
+  border-radius: 50%;
+}
+
+.bottom-button {
+  position: fixed;
+  bottom: 25px;
+  left: 25px;
+  width: 30px;
 }
 
 #iconContainer {
   display: grid;
-  margin: 6px 0;
+  margin: 20px 20px 20px 20px;
   grid-template-columns: repeat(auto-fit, 105px);
   justify-content: center;
   justify-items: center;

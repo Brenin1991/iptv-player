@@ -266,6 +266,8 @@ function toggleDashControl() {
     dashControl.classList.toggle("active");
     const topbar = document.getElementById("topbar");
     topbar.classList.toggle("active");
+    const iptvPlayer = document.getElementById("iptvPlayer");
+    iptvPlayer.classList.toggle("active");
     getWeather();
 }
 
@@ -289,14 +291,18 @@ function updateDateTime() {
         month: "long",
         day: "numeric",
     };
-    const timeString = date.toLocaleTimeString();
-    const dateString = date.toLocaleDateString("pt-BR", options);
+    const timeOptions = {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false // Use false para formato 24 horas ou true para 12 horas
+    };
+    const timeString = date.toLocaleTimeString('pt-BR', timeOptions);
+    const dateString = date.toLocaleDateString('pt-BR', options);
 
-    document.getElementById("time").innerText =
-        timeString;
-    document.getElementById("date").innerText =
-        dateString;
+    document.getElementById("time").innerText = timeString;
+    document.getElementById("date").innerText = dateString;
 }
+
 
 async function getWeather() {
     const apiKey = "955063c20b55d4a3d8e45d166c55524d";
@@ -411,6 +417,7 @@ function switchToDashboard() {
 function switchToLogin() {
     // Adiciona o efeito de fade escuro na tela de login
     document.getElementById('dashboard').classList.add('fade-out');
+    document.getElementById("loadingOverlay").style.display = "flex";
     
     // Após o fade escuro, faz a transição para o dashboard
     setTimeout(function() {

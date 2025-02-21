@@ -22,6 +22,7 @@
         <button id="removeButton">Remover Usuário</button>
       </div>
     </div>
+    <img src="setting.png" class="icon bottom-button" alt="">
   </div>
   
   
@@ -46,9 +47,7 @@
   </div>
   <div id="config"></div>
   <div id="dashboard">
-    <video id="iptvPlayer" width="100%" controls>
-      Seu navegador não suporta o elemento de vídeo.
-    </video>
+    
 
     <div id="dash-control" class="active">
       <div id="channelsContainer">
@@ -56,7 +55,13 @@
 
       <div id="channel-list">
       </div>
-      <div id="programacao">
+      <div id="info-bar">
+        <video id="iptvPlayer" width="100%" controls>
+          Seu navegador não suporta o elemento de vídeo.
+        </video>
+        <div id="programacao">
+
+        </div>
       </div>
     </div>
   </div>
@@ -74,7 +79,9 @@
 
   <div id="topbar" class="topbar active">
     <div class="left">
+      <img onclick="switchToLogin()" src="home.png" class="navbar-icon">
       <div class="time" id="time"></div>
+      
     </div>
 
     <div class="center">

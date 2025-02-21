@@ -179,7 +179,7 @@ function lerListaXMLTV(caminhoArquivo) {
 
 app.get("/programacao", async (req, res) => {
   try {
-    const programacao = await lerListaXMLTV("assets/prog.xml");
+    const programacao = await lerListaXMLTV("src/progs/prog.xml");
     res.json(programacao);
   } catch (error) {
     res.status(500).json({ error: "Erro ao carregar a programação" });
