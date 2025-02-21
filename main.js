@@ -12,28 +12,21 @@ function createWindow() {
     },
   });
 
-
-  // Maximizar a janela assim que for criada
   win.maximize();
 
-  // Remover a barra de menu
-  win.setMenuBarVisibility(false); // Isso oculta a barra de menus
+  win.setMenuBarVisibility(false);
 
-  // Função para verificar se o servidor está rodando na porta 3000
   function checkServerReady() {
     http.get('http://localhost:3000', (res) => {
       if (res.statusCode === 200) {
-        // Quando o servidor estiver pronto, carregue a URL
         win.loadURL('http://localhost:3000');
       }
     }).on('error', (e) => {
-      // Se o servidor não estiver pronto, tenta novamente após 1 segundo
       console.log('Aguardando servidor iniciar...');
       setTimeout(checkServerReady, 1000);
     });
   }
 
-  // Verifique se o servidor está pronto para receber conexões
   checkServerReady();
 }
 

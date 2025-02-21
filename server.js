@@ -32,11 +32,9 @@ if (!fs.existsSync(pastaListas)) {
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
 app.use(express.static(path.join(__dirname, "src")));
 app.use("/listas", express.static(path.join(__dirname, "listas")));
 app.use("/icons", express.static(path.join(__dirname, "assets/icons")));
-
 
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "src", "index.html"));
@@ -84,10 +82,9 @@ function lerListaM3U(caminhoArquivo) {
 }
 
 app.get("/streams/:id", async (req, res) => {
-  const userId = req.params.id; // Recebe o ID do usuário da URL
+  const userId = req.params.id;
 
   try {
-    // Primeiro, buscar o nome do arquivo M3U no banco de dados
     db.get("SELECT lista_m3u FROM usuarios WHERE id = ?", [userId], async (err, row) => {
       if (err) {
         return res.status(500).json({ error: "Erro ao buscar usuário no banco de dados" });
@@ -97,14 +94,13 @@ app.get("/streams/:id", async (req, res) => {
         return res.status(404).json({ error: "Usuário não encontrado" });
       }
 
-      const nomeArquivo = row.lista_m3u; // Nome do arquivo M3U salvo no banco
+      const nomeArquivo = row.lista_m3u;
 
-      // Agora, busca o arquivo M3U na pasta 'listas'
       const caminhoArquivo = path.join(__dirname, "listas", nomeArquivo);
 
       try {
-        const streams = await lerListaM3U(caminhoArquivo); // Chama a função para ler o arquivo
-        res.json(streams); // Retorna os dados da lista M3U
+        const streams = await lerListaM3U(caminhoArquivo);
+        res.json(streams);
       } catch (error) {
         res.status(500).json({ error: "Erro ao carregar os streams da lista" });
       }
@@ -133,7 +129,6 @@ function lerListaXMLTV(caminhoArquivo) {
         const canais = result.tv.channel || [];
         const programas = result.tv.programme || [];
 
-        // Cria um mapa de canais com a ID
         const canaisMap = canais.reduce((map, channel) => {
           const channelId = channel["$"]?.id;
           const channelName = channel["display-name"]?.[0]?._;
@@ -186,15 +181,12 @@ app.get("/programacao", async (req, res) => {
   }
 });
 
-
-// 📌 Conectar ao banco SQLite
 const db = new sqlite3.Database("usuarios.db", (err) => {
   if (err) {
     console.error("Erro ao conectar ao banco de dados:", err.message);
   } else {
     console.log("Banco de dados conectado.");
 
-    // Alterar a tabela para incluir a coluna 'icone'
     db.run(`
       CREATE TABLE IF NOT EXISTS usuarios (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -220,11 +212,9 @@ async function validarEGuardarM3U(url) {
 
     if (!resposta.data.includes("#EXTINF")) throw new Error("Lista M3U inválida");
 
-    // Gerar um nome aleatório para a lista
     const nomeArquivo = `lista_${Date.now()}_${Math.floor(Math.random() * 10000)}.m3u`;
     const caminhoArquivo = path.join(pastaListas, nomeArquivo);
 
-    // Salvar a lista no servidor
     fs.writeFileSync(caminhoArquivo, resposta.data, "utf8");
 
     console.log(`Lista salva em: ${caminhoArquivo}`);
@@ -235,7 +225,6 @@ async function validarEGuardarM3U(url) {
   }
 }
 
-// 📌 Rota para cadastrar usuário e salvar a lista M3U
 app.post("/cadastrar", async (req, res) => {
   const { nome, lista_m3u, icone } = req.body;
 
@@ -271,20 +260,17 @@ app.get("/usuarios", (req, res) => {
   });
 });
 
-// Rota para listar os ícones
 app.get("/icones", (req, res) => {
   const iconDir = path.join(__dirname, "assets", "icons");
   fs.readdir(iconDir, (err, files) => {
     if (err) {
       return res.status(500).json({ error: "Erro ao carregar ícones." });
     }
-    // Filtra apenas arquivos de imagem
     const icons = files.filter(file => file.endsWith(".png") || file.endsWith(".jpg"));
     res.json(icons);
   });
 });
 
-// Rota para deletar um usuário pelo ID
 app.delete('/usuarios/:id', (req, res) => {
   const userId = req.params.id;
 
@@ -298,9 +284,6 @@ app.delete('/usuarios/:id', (req, res) => {
     res.json({ message: "Usuário deletado com sucesso!" });
   });
 });
-
-
-
 
 app.listen(port, '127.0.0.1', () => {
   console.log(`Servidor rodando em http://0.0.0.0:${port}`);
